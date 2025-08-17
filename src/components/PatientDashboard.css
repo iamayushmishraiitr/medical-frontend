@@ -371,3 +371,653 @@
     font-size: 1.1rem;
   }
 }
+
+.history-section {
+  background-color: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.history-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+}
+
+.toggle-history-btn {
+  background-color: #198754;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-history-btn:hover {
+  background-color: #157347;
+  transform: translateY(-1px);
+}
+
+.history-content {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.history-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #198754;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appointment-item {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.appointment-item:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.appointment-doctor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.doctor-icon {
+  color: #6c757d;
+}
+
+.doctor-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.doctor-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0 0 4px 0;
+}
+
+.specialization {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.appointment-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-icon {
+  border-radius: 50%;
+}
+
+.status-icon.completed {
+  color: #198754;
+}
+
+.status-icon.upcoming {
+  color: #0d6efd;
+}
+
+.status-icon.cancelled {
+  color: #dc3545;
+}
+
+.status-icon.pending {
+  color: #ffc107;
+}
+
+.status-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+
+.status-text.completed {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-text.upcoming {
+  background-color: #cff4fc;
+  color: #055160;
+}
+
+.status-text.cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-text.pending {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.appointment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-icon {
+  color: #6c757d;
+  min-width: 16px;
+}
+
+.detail-text {
+  color: #495057;
+  font-size: 0.875rem;
+}
+
+.detail-text.notes {
+  font-style: italic;
+  color: #6c757d;
+}
+
+.no-appointments {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+/* Responsive Design for History Section */
+@media (max-width: 768px) {
+  .history-section {
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  
+  .history-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .history-title {
+    justify-content: center;
+    font-size: 1.25rem;
+  }
+  
+  .toggle-history-btn {
+    width: 100%;
+  }
+  
+  .history-stats {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .stat-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .appointment-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .appointment-status {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .history-section {
+    padding: 16px;
+  }
+  
+  .history-title {
+    font-size: 1.1rem;
+  }
+  
+  .appointment-item {
+    padding: 16px;
+  }
+  
+  .doctor-name {
+    font-size: 1rem;
+  }
+  
+  .status-text {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+  }
+}
+
+/* Dashboard Layout */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.main-content {
+  min-width: 0; /* Prevents grid overflow */
+}
+
+.container {
+  width: 100%;
+}
+
+/* History Sidebar */
+.history-sidebar {
+  background-color: white;
+  border-radius: 16px;
+  padding: 24px;
+  height: fit-content;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  position: sticky;
+  top: 100px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.history-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+}
+
+.mobile-toggle-btn {
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: none;
+}
+
+.mobile-toggle-btn:hover {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.history-content {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.history-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #198754;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-align: center;
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.appointment-item {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.appointment-item:hover {
+  background-color: #e9ecef;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.appointment-doctor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.doctor-icon {
+  color: #6c757d;
+}
+
+.doctor-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.doctor-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0 0 2px 0;
+  line-height: 1.2;
+}
+
+.specialization {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.appointment-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-icon {
+  border-radius: 50%;
+}
+
+.status-icon.completed {
+  color: #198754;
+}
+
+.status-icon.upcoming {
+  color: #0d6efd;
+}
+
+.status-icon.cancelled {
+  color: #dc3545;
+}
+
+.status-icon.pending {
+  color: #ffc107;
+}
+
+.status-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.status-text.completed {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-text.upcoming {
+  background-color: #cff4fc;
+  color: #055160;
+}
+
+.status-text.cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-text.pending {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+.appointment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-icon {
+  color: #6c757d;
+  min-width: 12px;
+}
+
+.detail-text {
+  color: #495057;
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.detail-text.notes {
+  font-style: italic;
+  color: #6c757d;
+}
+
+.no-appointments {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .history-sidebar {
+    position: static;
+    order: -1;
+    margin-bottom: 24px;
+  }
+  
+  .mobile-toggle-btn {
+    display: block;
+  }
+  
+  .history-header {
+    cursor: pointer;
+  }
+  
+  .history-title {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    padding: 0 15px;
+    gap: 20px;
+  }
+  
+  .history-sidebar {
+    padding: 20px;
+  }
+  
+  .history-title {
+    font-size: 1.1rem;
+  }
+  
+  .history-stats {
+    padding: 14px;
+    gap: 12px;
+  }
+  
+  .stat-number {
+    font-size: 1.25rem;
+  }
+  
+  .appointment-item {
+    padding: 14px;
+  }
+  
+  .doctor-name {
+    font-size: 0.85rem;
+  }
+  
+  .status-text {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-layout {
+    padding: 0 10px;
+  }
+  
+  .history-sidebar {
+    padding: 16px;
+  }
+  
+  .history-stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .stat-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .appointment-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .appointment-status {
+    align-self: flex-end;
+  }
+}

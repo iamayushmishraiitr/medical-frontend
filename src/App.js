@@ -13,8 +13,7 @@ function App() {
     setUser(userData);
   };
 
-  const handleLogout = () => {
-    setUser(null);
+  const handleLogout = () => {    setUser(null);
   };
 
   return (
