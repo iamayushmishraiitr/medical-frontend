@@ -160,3 +160,4 @@ For questions or support, please open an issue in the repository or contact the 
 **Note**: This is a demo application with mock data. For production use, integrate with real backend services and implement proper security measures.
 # medical-app
 # medical-app
+# medical-frontend
