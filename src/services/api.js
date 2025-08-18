@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'https://medical-app-backend-1-0070.onrender.com';
+export const API_BASE_URL = 'https://medical-app-backend-1-0070.onrender.com/api';
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
