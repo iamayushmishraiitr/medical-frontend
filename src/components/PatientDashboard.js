@@ -1,75 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Star, MapPin, Clock, LogOut, Calendar, User, CheckCircle, XCircle, Clock as ClockIcon, ChevronDown, ChevronUp } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import AppointmentModal from './AppointmentModal';
-import './PatientDashboard.css';
+import React, { useState, useEffect } from "react";
+import {
+  Search,
+  Star,
+  MapPin,
+  Clock,
+  LogOut,
+  Calendar,
+  User,
+  CheckCircle,
+  XCircle,
+  Clock as ClockIcon,
+  ChevronDown,
+  ChevronUp,
+  Stars
+} from "lucide-react";
+import { toast } from "react-hot-toast";
+import AppointmentModal from "./AppointmentModal";
+import { api } from "../services/api";
+import "./PatientDashboard.css";
 
 const PatientDashboard = ({ user, onLogout }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSpecialization, setSelectedSpecialization] = useState('All');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSpecialization, setSelectedSpecialization] = useState("All");
   const [doctors, setDoctors] = useState([]);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [appointmentHistory, setAppointmentHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const specializations = ['All', 'Cardiology', 'Dermatology', 'Pediatrics', 'Orthopedics', 'Neurology', 'Oncology'];
-
-  // Mock appointment history data
-  const [appointmentHistory, setAppointmentHistory] = useState([
-    {
-      id: 1,
-      doctorName: 'Dr. Sarah Smith',
-      specialization: 'Cardiology',
-      date: '2024-01-10',
-      time: '10:00 AM',
-      status: 'completed',
-      location: 'New York Medical Center',
-      notes: 'Regular checkup, blood pressure normal'
-    },
-    {
-      id: 2,
-      doctorName: 'Dr. Michael Johnson',
-      specialization: 'Dermatology',
-      date: '2024-01-05',
-      time: '2:30 PM',
-      status: 'completed',
-      location: 'Downtown Clinic',
-      notes: 'Skin rash treatment, prescribed medication'
-    },
-    {
-      id: 3,
-      doctorName: 'Dr. Emily Davis',
-      specialization: 'Pediatrics',
-      date: '2024-01-15',
-      time: '11:00 AM',
-      status: 'upcoming',
-      location: 'Children\'s Hospital',
-      notes: 'Annual physical examination'
-    },
-    {
-      id: 4,
-      doctorName: 'Dr. Robert Wilson',
-      specialization: 'Orthopedics',
-      date: '2024-01-08',
-      time: '9:00 AM',
-      status: 'cancelled',
-      location: 'Sports Medicine Center',
-      notes: 'Knee pain consultation'
-    }
-  ]);
+  const specializations = [
+    "All",
+    "Cardiology",
+    "Dermatology",
+    "Pediatrics",
+    "Orthopedics",
+    "Neurology",
+    "Oncology",
+  ];
 
   // Check if mobile view
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 1200);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Set initial state based on screen size
@@ -77,78 +58,31 @@ const PatientDashboard = ({ user, onLogout }) => {
     setShowHistory(!isMobile);
   }, [isMobile]);
 
-  // Mock doctor data
+  // Fetch doctors and appointments
   useEffect(() => {
-    const mockDoctors = [
-      {
-        id: 1,
-        name: 'Dr. Sarah Smith',
-        specialization: 'Cardiology',
-        rating: 4.8,
-        experience: 15,
-        location: 'New York Medical Center',
-        nextAvailable: '2024-01-15',
-        price: 150,
-        image: 'https://via.placeholder.com/60x60/20c997/ffffff?text=SS'
-      },
-      {
-        id: 2,
-        name: 'Dr. Michael Johnson',
-        specialization: 'Dermatology',
-        rating: 4.9,
-        experience: 12,
-        location: 'Downtown Clinic',
-        nextAvailable: '2024-01-16',
-        price: 120,
-        image: 'https://via.placeholder.com/60x60/0d6efd/ffffff?text=MJ'
-      },
-      {
-        id: 3,
-        name: 'Dr. Emily Davis',
-        specialization: 'Pediatrics',
-        rating: 4.7,
-        experience: 10,
-        location: 'Children\'s Hospital',
-        nextAvailable: '2024-01-17',
-        price: 100,
-        image: 'https://via.placeholder.com/60x60/198754/ffffff?text=ED'
-      },
-      {
-        id: 4,
-        name: 'Dr. Robert Wilson',
-        specialization: 'Orthopedics',
-        rating: 4.6,
-        experience: 18,
-        location: 'Sports Medicine Center',
-        nextAvailable: '2024-01-18',
-        price: 180,
-        image: 'https://via.placeholder.com/60x60/6c757d/ffffff?text=RW'
-      },
-      {
-        id: 5,
-        name: 'Dr. Lisa Chen',
-        specialization: 'Neurology',
-        rating: 4.9,
-        experience: 20,
-        location: 'Neurological Institute',
-        nextAvailable: '2024-01-19',
-        price: 200,
-        image: 'https://via.placeholder.com/60x60/dc3545/ffffff?text=LC'
-      },
-      {
-        id: 6,
-        name: 'Dr. James Brown',
-        specialization: 'Oncology',
-        rating: 4.8,
-        experience: 16,
-        location: 'Cancer Treatment Center',
-        nextAvailable: '2024-01-20',
-        price: 250,
-        image: 'https://via.placeholder.com/60x60/fd7e14/ffffff?text=JB'
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        const doctorsResponse = await api.getDoctors();
+        if (doctorsResponse.doctors) {
+          setDoctors(doctorsResponse.doctors);
+          setFilteredDoctors(doctorsResponse.doctors);
+        }
+
+        const appointmentsResponse = await api.getAppointments();
+        if (appointmentsResponse.appointments) {
+          setAppointmentHistory(appointmentsResponse.appointments);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to load data. Please refresh the page.");
+      } finally {
+        setIsLoading(false);
       }
-    ];
-    setDoctors(mockDoctors);
-    setFilteredDoctors(mockDoctors);
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -156,15 +90,18 @@ const PatientDashboard = ({ user, onLogout }) => {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(doctor =>
-        doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doctor.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (doctor) =>
+          doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          doctor.specialization.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by specialization
-    if (selectedSpecialization !== 'All') {
-      filtered = filtered.filter(doctor => doctor.specialization === selectedSpecialization);
+    if (selectedSpecialization !== "All") {
+      filtered = filtered.filter(
+        (doctor) => doctor.specialization === selectedSpecialization
+      );
     }
 
     setFilteredDoctors(filtered);
@@ -175,30 +112,45 @@ const PatientDashboard = ({ user, onLogout }) => {
     setIsModalOpen(true);
   };
 
-  const handleScheduleAppointment = (appointmentData) => {
-    // Here you would typically send the appointment data to your backend
-    console.log('Scheduling appointment:', {
-      doctor: selectedDoctor.name,
-      ...appointmentData
-    });
-    
-    // Show success message
-    toast.success(`Appointment scheduled successfully with ${selectedDoctor.name} on ${appointmentData.date} at ${appointmentData.time}`);
-    
-    // Close modal
-    setIsModalOpen(false);
-    
-    // Reset selected doctor
-    setSelectedDoctor(null);
+  const handleScheduleAppointment = async (appointmentData) => {
+    try {
+      const response = await api.createAppointment({
+        doctorId: selectedDoctor._id,
+        date: appointmentData.date,
+        time: appointmentData.time,
+        symptoms: appointmentData.symptoms,
+        notes: appointmentData.notes,
+      });
+
+      if (response.appointment) {
+        toast.success(
+          `Appointment scheduled successfully with ${selectedDoctor.name} on ${appointmentData.date} at ${appointmentData.time}`
+        );
+
+        // Refresh appointments
+        const appointmentsResponse = await api.getAppointments();
+        if (appointmentsResponse.appointments) {
+          setAppointmentHistory(appointmentsResponse.appointments);
+        }
+
+        setIsModalOpen(false);
+        setSelectedDoctor(null);
+      } else {
+        toast.error(response.message || "Failed to schedule appointment");
+      }
+    } catch (error) {
+      console.error("Error scheduling appointment:", error);
+      toast.error("Failed to schedule appointment. Please try again.");
+    }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'completed':
-        return <CheckCircle size={14} className="status-icon completed" />;
-      case 'upcoming':
-        return <ClockIcon size={14} className="status-icon upcoming" />;
-      case 'cancelled':
+      case "confirmed":
+        return <CheckCircle size={14} className="status-icon confirmed" />;
+      case "pending":
+        return <ClockIcon size={14} className="status-icon pendin" />;
+      case "cancelled":
         return <XCircle size={14} className="status-icon cancelled" />;
       default:
         return <ClockIcon size={14} className="status-icon pending" />;
@@ -207,22 +159,22 @@ const PatientDashboard = ({ user, onLogout }) => {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'completed':
-        return 'Completed';
-      case 'upcoming':
-        return 'Upcoming';
-      case 'cancelled':
-        return 'Cancelled';
+      case "confirmed":
+        return "confirmed";
+      case "pending":
+        return "pending";
+      case "cancelled":
+        return "Cancelled";
       default:
-        return 'Pending';
+        return "Pending";
     }
   };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -230,6 +182,17 @@ const PatientDashboard = ({ user, onLogout }) => {
     setShowHistory(!showHistory);
   };
 
+  if (isLoading) {
+    return (
+      <div className="patient-dashboard">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  const randomRating = (Math.random() * (4.6 - 4.1) + 4.1).toFixed(1);
   return (
     <div className="patient-dashboard">
       {/* Header */}
@@ -274,7 +237,9 @@ const PatientDashboard = ({ user, onLogout }) => {
                 {specializations.map((spec) => (
                   <button
                     key={spec}
-                    className={`filter-btn ${selectedSpecialization === spec ? 'active' : ''}`}
+                    className={`filter-btn ${
+                      selectedSpecialization === spec ? "active" : ""
+                    }`}
                     onClick={() => setSelectedSpecialization(spec)}
                   >
                     {spec}
@@ -285,35 +250,32 @@ const PatientDashboard = ({ user, onLogout }) => {
               {/* Doctors Grid */}
               <div className="doctors-grid">
                 {filteredDoctors.map((doctor) => (
-                  <div key={doctor.id} className="doctor-card">
+                  <div key={doctor._id} className="doctor-card">
                     <div className="doctor-header">
-                      <img src={doctor.image} alt={doctor.name} className="doctor-avatar" />
+                      <div className="doctor-avatar">
+                        <img
+                          src="https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg"
+                          alt={`Avatar of Dr. ${doctor.name}`}
+                        />
+                      </div>
                       <div className="doctor-info">
-                        <h3 className="doctor-name">{doctor.name}</h3>
-                        <p className="doctor-specialization">{doctor.specialization}</p>
+                        <h3 className="doctor-name">Dr. {doctor.name}</h3>
+                        <p className="doctor-specialization">
+                          {doctor.specialization}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="doctor-rating">
-                      <div className="rating-info">
-                        <Star size={16} className="star-icon" />
-                        <span className="rating">{doctor.rating}</span>
-                      </div>
-                      <span className="experience">{doctor.experience} years</span>
+                    <div style={{width :"100%" ,display:"flex", marginBottom :"10px" , gap :"10px"}}>
+                      <Star size={18} className="star-icon" />
+                      <h5>{randomRating}</h5>
                     </div>
-
                     <div className="doctor-location">
                       <MapPin size={16} className="location-icon" />
-                      <span>{doctor.location}</span>
-                    </div>
-
-                    <div className="doctor-availability">
-                      <Clock size={16} className="clock-icon" />
-                      <span>Next available: {doctor.nextAvailable}</span>
+                      <span>{doctor.address || "Location not specified"}</span>
                     </div>
 
                     <div className="doctor-footer">
-                      <span className="price">${doctor.price}</span>
                       <button
                         className="book-btn"
                         onClick={() => handleBookAppointment(doctor)}
@@ -342,42 +304,60 @@ const PatientDashboard = ({ user, onLogout }) => {
                 Recent Appointments
               </h3>
               {isMobile && (
-                <button 
+                <button
                   className="mobile-toggle-btn"
                   onClick={toggleHistory}
-                  aria-label={showHistory ? 'Hide appointments' : 'Show appointments'}
+                  aria-label={
+                    showHistory ? "Hide appointments" : "Show appointments"
+                  }
                 >
-                  {showHistory ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  {showHistory ? (
+                    <ChevronUp size={20} />
+                  ) : (
+                    <ChevronDown size={20} />
+                  )}
                 </button>
               )}
             </div>
-            
+
             {showHistory && (
               <div className="history-content">
                 <div className="history-stats">
                   <div className="stat-item">
-                    <span className="stat-number">{appointmentHistory.filter(apt => apt.status === 'completed').length}</span>
-                    <span className="stat-label">Completed</span>
+                    <span className="stat-number">
+                      {
+                        appointmentHistory.filter(
+                          (apt) => apt.status === "confirmed"
+                        ).length
+                      }
+                    </span>
+                    <span className="stat-label">Confirmed</span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-number">{appointmentHistory.filter(apt => apt.status === 'upcoming').length}</span>
-                    <span className="stat-label">Upcoming</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-number">{appointmentHistory.filter(apt => apt.status === 'cancelled').length}</span>
-                    <span className="stat-label">Cancelled</span>
+                    <span className="stat-number">
+                      {
+                        appointmentHistory.filter(
+                          (apt) => apt.status === "pending"
+                        ).length
+                      }
+                    </span>
+                    <span className="stat-label">Pending</span>
                   </div>
                 </div>
-                
+
                 <div className="appointments-list">
                   {appointmentHistory.slice(0, 5).map((appointment) => (
-                    <div key={appointment.id} className="appointment-item">
+                    <div key={appointment._id} className="appointment-item">
                       <div className="appointment-header">
                         <div className="appointment-doctor">
                           <User size={14} className="doctor-icon" />
                           <div className="doctor-details">
-                            <h4 className="doctor-name">{appointment.doctorName}</h4>
-                            <p className="specialization">{appointment.specialization}</p>
+                            <h4 className="doctor-name">
+                              {appointment.doctor?.name || "Unknown Doctor"}
+                            </h4>
+                            <p className="specialization">
+                              {appointment.doctor?.specialization || "Unknown"}
+                            </p>
                           </div>
                         </div>
                         <div className="appointment-status">
@@ -387,27 +367,35 @@ const PatientDashboard = ({ user, onLogout }) => {
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="appointment-details">
                         <div className="detail-row">
                           <Calendar size={12} className="detail-icon" />
-                          <span className="detail-text">{formatDate(appointment.date)} at {appointment.time}</span>
+                          <span className="detail-text">
+                            {formatDate(appointment.date)} at {appointment.time}
+                          </span>
                         </div>
-                        <div className="detail-row">
-                          <MapPin size={12} className="detail-icon" />
-                          <span className="detail-text">{appointment.location}</span>
-                        </div>
+                        {appointment.symptoms && (
+                          <div className="detail-row">
+                            <span className="detail-icon">🏥</span>
+                            <span className="detail-text notes">
+                              {appointment.symptoms}
+                            </span>
+                          </div>
+                        )}
                         {appointment.notes && (
                           <div className="detail-row">
                             <span className="detail-icon">📝</span>
-                            <span className="detail-text notes">{appointment.notes}</span>
+                            <span className="detail-text notes">
+                              {appointment.notes}
+                            </span>
                           </div>
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
-                
+
                 {appointmentHistory.length === 0 && (
                   <div className="no-appointments">
                     <p>No appointments found.</p>
@@ -419,15 +407,18 @@ const PatientDashboard = ({ user, onLogout }) => {
         </div>
       </main>
 
-      {/* Appointment Modal */}
       <AppointmentModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        appointment={selectedDoctor ? {
-          doctorName: selectedDoctor.name,
-          specialization: selectedDoctor.specialization,
-          location: selectedDoctor.location
-        } : null}
+        appointment={
+          selectedDoctor
+            ? {
+                doctorName: selectedDoctor.name,
+                specialization: selectedDoctor.specialization,
+                location: selectedDoctor.address || "Location not specified",
+              }
+            : null
+        }
         onSchedule={handleScheduleAppointment}
         isPatient={true}
       />

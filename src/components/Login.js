@@ -1,47 +1,70 @@
 import React, { useState } from 'react';
-import { User, Eye, EyeOff, Stethoscope } from 'lucide-react';
+import { User, Eye, EyeOff, Stethoscope, Mail, Lock } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import './Login.css';
 
-const Login = ({ onLogin }) => {
-  const [accountType, setAccountType] = useState('patient');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Login = ({ onLogin, onSwitchToSignup }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    role: 'patient'
+  });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // Demo login logic
-    if (email === 'patient@demo.com' && password === 'password123') {
-      toast.success('Welcome back, John Doe!');
-      onLogin({
-        id: 1,
-        name: 'John Doe',
-        email: 'patient@demo.com',
-        role: 'patient'
+    try {
+      const response = await fetch('https://medical-app-backend-73qf.onrender.com/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+        credentials: 'include',
       });
-    } else if (email === 'doctor@demo.com' && password === 'password123') {
-      toast.success('Welcome back, Dr. Sarah Smith!');
-      onLogin({
-        id: 1,
-        name: 'Dr. Sarah Smith',
-        email: 'doctor@demo.com',
-        role: 'doctor'
-      });
-    } else {
-      toast.error('Invalid credentials. Please use the demo credentials provided.');
+
+      const data = await response.json();
+      console.log("here is data",data)
+      if (response.ok) {
+        console.log("here is token",data?.token)
+        localStorage.setItem('token', data?.token);
+        localStorage.setItem('user', JSON.stringify(data?.user));
+        
+        toast.success(`Welcome back, ${data.user.name}!`);
+        onLogin(data.user);
+      } else {
+        toast.error(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const getContextText = () => {
-    return accountType === 'patient' 
+    return formData.role === 'patient' 
       ? 'Access your appointments and find doctors.'
       : 'Manage your appointments and schedule.';
   };
 
   const getButtonText = () => {
-    return `Sign In as ${accountType === 'patient' ? 'Patient' : 'Doctor'}`;
+    return `Sign In as ${formData.role === 'patient' ? 'Patient' : 'Doctor'}`;
   };
 
   return (
@@ -66,16 +89,16 @@ const Login = ({ onLogin }) => {
           <div className="account-type-selector">
             <button
               type="button"
-              className={`type-btn ${accountType === 'patient' ? 'active' : ''}`}
-              onClick={() => setAccountType('patient')}
+              className={`type-btn ${formData.role === 'patient' ? 'active' : ''}`}
+              onClick={() => setFormData(prev => ({ ...prev, role: 'patient' }))}
             >
               <User size={16} />
               Patient
             </button>
             <button
               type="button"
-              className={`type-btn ${accountType === 'doctor' ? 'active' : ''}`}
-              onClick={() => setAccountType('doctor')}
+              className={`type-btn ${formData.role === 'doctor' ? 'active' : ''}`}
+              onClick={() => setFormData(prev => ({ ...prev, role: 'doctor' }))}
             >
               <User size={16} />
               Doctor
@@ -88,26 +111,34 @@ const Login = ({ onLogin }) => {
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">
+                <Mail size={16} />
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
+                name="email"
                 placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleInputChange}
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">
+                <Lock size={16} />
+                Password
+              </label>
               <div className="password-input">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
+                  name="password"
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleInputChange}
                   required
                 />
                 <button
@@ -120,20 +151,23 @@ const Login = ({ onLogin }) => {
               </div>
             </div>
 
-            <button type="submit" className="signin-btn">
-              {getButtonText()}
+            <button type="submit" className="signin-btn" disabled={isLoading}>
+              {isLoading ? 'Signing In...' : getButtonText()}
             </button>
           </form>
 
-          <div className="demo-credentials">
-            <h4>Demo Credentials:</h4>
-            <div className="credential-item">
-              <strong>Patient:</strong> patient@demo.com / password123
-            </div>
-            <div className="credential-item">
-              <strong>Doctor:</strong> doctor@demo.com / password123
-            </div>
+          <div className="form-footer">
+            <p>Don't have an account? 
+              <button 
+                type="button" 
+                className="switch-btn"
+                onClick={onSwitchToSignup}
+              >
+                Sign Up
+              </button>
+            </p>
           </div>
+
         </div>
       </div>
     </div>

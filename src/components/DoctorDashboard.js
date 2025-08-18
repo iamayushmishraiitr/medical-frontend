@@ -1,74 +1,78 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Settings, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth } from 'date-fns';
-import { toast } from 'react-hot-toast';
-import AppointmentModal from './AppointmentModal';
-import './DoctorDashboard.css';
+import React, { useState, useEffect } from "react";
+import {
+  Calendar,
+  Settings,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import {
+  format,
+  addMonths,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameDay,
+  isSameMonth,
+} from "date-fns";
+import { toast } from "react-hot-toast";
+import { api } from "../services/api";
+import "./DoctorDashboard.css";
 
 const DoctorDashboard = ({ user, onLogout }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [activeTab, setActiveTab] = useState('today');
+  const [activeTab, setActiveTab] = useState("today");
   const [appointments, setAppointments] = useState([]);
   const [unavailableDates, setUnavailableDates] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
 
-  // Mock appointments data
+  // ✅ Helper: Get current IST time
+  const getCurrentIST = () => {
+    const now = new Date();
+    return new Date(now.getTime() + (5 * 60 + 30) * 60000); // UTC + 5:30
+  };
+
   useEffect(() => {
-    const mockAppointments = [
-      {
-        id: 1,
-        patientName: 'John Doe',
-        age: 35,
-        type: 'Consultation',
-        time: '09:00 AM',
-        status: 'confirmed',
-        date: '2025-08-18',
-        patientImage: 'https://via.placeholder.com/40x40/20c997/ffffff?text=JD'
-      },
-      {
-        id: 2,
-        patientName: 'Jane Smith',
-        age: 28,
-        type: 'Follow-up',
-        time: '10:30 AM',
-        status: 'confirmed',
-        date: '2025-08-18',
-        patientImage: 'https://via.placeholder.com/40x40/0d6efd/ffffff?text=JS'
-      },
-      {
-        id: 3,
-        patientName: 'Mike Johnson',
-        age: 42,
-        type: 'Check-up',
-        time: '02:00 PM',
-        status: 'pending',
-        date: '2025-08-18',
-        patientImage: 'https://via.placeholder.com/40x40/198754/ffffff?text=MJ'
-      },
-      {
-        id: 4,
-        patientName: 'Sarah Wilson',
-        age: 31,
-        type: 'Consultation',
-        time: '11:00 AM',
-        status: 'confirmed',
-        date: '2025-08-19',
-        patientImage: 'https://via.placeholder.com/40x40/dc3545/ffffff?text=SW'
-      },
-      {
-        id: 5,
-        patientName: 'David Brown',
-        age: 45,
-        type: 'Follow-up',
-        time: '03:30 PM',
-        status: 'confirmed',
-        date: '2025-08-19',
-        patientImage: 'https://via.placeholder.com/40x40/fd7e14/ffffff?text=DB'
+    const fetchAppointments = async () => {
+      setLoadingAppointments(true);
+      try {
+        const appointmentsData = await api.getAppointments();
+        const formattedAppointments = appointmentsData?.appointments?.map(
+          (apt) => {
+            const appointmentDateTime = new Date(
+              `${apt.date.slice(0, 10)}T${apt.time}`
+            );
+            const nowIST = getCurrentIST();
+
+            let finalStatus = apt.status;
+            if (appointmentDateTime < nowIST) {
+              finalStatus = "completed";
+            }
+
+            return {
+              ...apt,
+              date: apt.date.slice(0, 10),
+              patientName: apt.patient.name,
+              patientImage:
+                apt.patient.profileImage ||
+                `https://via.placeholder.com/40x40/0d6efd/ffffff?text=${apt.patient.name[0]}`,
+              id: apt._id,
+              status: finalStatus,
+            };
+          }
+        );
+        setAppointments(formattedAppointments || []);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+        toast.error(error.message || "Failed to fetch appointments");
+      } finally {
+        setLoadingAppointments(false);
       }
-    ];
-    setAppointments(mockAppointments);
+    };
+
+    fetchAppointments();
   }, []);
 
   const getDaysInMonth = (date) => {
@@ -78,55 +82,65 @@ const DoctorDashboard = ({ user, onLogout }) => {
   };
 
   const getAppointmentsForDate = (date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return appointments.filter(apt => apt.date === dateStr);
+    const dateStr = format(date, "yyyy-MM-dd");
+    return appointments.filter((apt) => apt.date === dateStr);
   };
 
-  const handleDateSelect = (date) => {
-    setSelectedDate(date);
-  };
+  const handleDateSelect = (date) => setSelectedDate(date);
 
   const handleMarkUnavailable = () => {
-    const dateStr = format(selectedDate, 'yyyy-MM-dd');
-    if (unavailableDates.includes(dateStr)) {
-      setUnavailableDates(unavailableDates.filter(d => d !== dateStr));
-    } else {
-      setUnavailableDates([...unavailableDates, dateStr]);
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    setUnavailableDates((prev) =>
+      prev.includes(dateStr)
+        ? prev.filter((d) => d !== dateStr)
+        : [...prev, dateStr]
+    );
+  };
+
+  const isDateUnavailable = (date) =>
+    unavailableDates.includes(format(date, "yyyy-MM-dd"));
+
+  // ✅ Accept appointment
+  const handleAccept = async (id) => {
+    try {
+      await api.updateAppointmentStatus(id, "confirmed");
+      setAppointments((prev) =>
+        prev.map((apt) =>
+          apt.id === id ? { ...apt, status: "confirmed" } : apt
+        )
+      );
+      toast.success("Appointment confirmed");
+    } catch (error) {
+      console.error("Error accepting appointment:", error);
+      toast.error(error.message || "Failed to confirm appointment");
     }
   };
 
-  const isDateUnavailable = (date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return unavailableDates.includes(dateStr);
-  };
-
-  const handleViewDetails = (appointment) => {
-    setSelectedAppointment(appointment);
-    setIsModalOpen(true);
-  };
-
-  const handleScheduleAppointment = (appointmentData) => {
-    // Here you would typically update the appointment in your backend
-    console.log('Updating appointment:', {
-      appointmentId: appointmentData.appointmentId,
-      ...appointmentData
-    });
-    
-    // Show success message
-    toast.success(`Appointment updated successfully for ${selectedAppointment.patientName} on ${appointmentData.date} at ${appointmentData.time}`);
+  // ✅ Delete appointment
+  const handleDelete = async (id) => {
+    try {
+      await api.deleteAppointment(id);
+      setAppointments((prev) => prev.filter((apt) => apt.id !== id));
+      toast.success("Appointment deleted");
+    } catch (error) {
+      console.error("Error deleting appointment:", error);
+      toast.error(error.message || "Failed to delete appointment");
+    }
   };
 
   const getStatusColor = (status) => {
-    return status === 'confirmed' ? '#198754' : '#ffc107';
+    if (status === "confirmed") return "#198754"; // green
+    if (status === "completed") return "#6c757d"; // gray
+    return "#ffc107"; // yellow (pending)
   };
 
-  const getStatusText = (status) => {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  };
+  const getStatusText = (status) =>
+    status.charAt(0).toUpperCase() + status.slice(1);
 
-  const filteredAppointments = activeTab === 'today' 
-    ? getAppointmentsForDate(selectedDate)
-    : appointments.filter(apt => new Date(apt.date) < new Date());
+  const filteredAppointments =
+    activeTab === "today"
+      ? getAppointmentsForDate(selectedDate)
+      : appointments.filter((apt) => new Date(apt.date) < new Date());
 
   return (
     <div className="doctor-dashboard">
@@ -139,150 +153,159 @@ const DoctorDashboard = ({ user, onLogout }) => {
         <div className="header-right">
           <span className="welcome-text">Welcome, {user.name}</span>
           <button className="logout-btn" onClick={onLogout}>
-            <LogOut size={16} />
-            Logout
+            <LogOut size={16} /> Logout
           </button>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="dashboard-main">
         <div className="dashboard-container">
-          {/* Left Sidebar */}
           <div className="sidebar">
-            {/* Calendar Section */}
             <div className="calendar-section">
               <div className="section-header">
                 <Calendar size={20} />
                 <h3>Calendar</h3>
               </div>
-              <p className="section-description">Select a date to view appointments.</p>
-              
+              <p className="section-description">
+                Select a date to view appointments.
+              </p>
               <div className="calendar">
                 <div className="calendar-header">
-                  <button 
+                  <button
                     className="calendar-nav-btn"
                     onClick={() => setCurrentDate(subMonths(currentDate, 1))}
                   >
                     <ChevronLeft size={16} />
                   </button>
-                  <h4>{format(currentDate, 'MMMM yyyy')}</h4>
-                  <button 
+                  <h4>{format(currentDate, "MMMM yyyy")}</h4>
+                  <button
                     className="calendar-nav-btn"
                     onClick={() => setCurrentDate(addMonths(currentDate, 1))}
                   >
                     <ChevronRight size={16} />
                   </button>
                 </div>
-                
                 <div className="calendar-weekdays">
-                  {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                    <div key={day} className="weekday">{day}</div>
+                  {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
+                    <div key={d} className="weekday">
+                      {d}
+                    </div>
                   ))}
                 </div>
-                
                 <div className="calendar-days">
-                  {getDaysInMonth(currentDate).map((date, index) => {
+                  {getDaysInMonth(currentDate).map((date, i) => {
                     const isSelected = isSameDay(date, selectedDate);
                     const isCurrentMonth = isSameMonth(date, currentDate);
                     const isUnavailable = isDateUnavailable(date);
-                    const hasAppointments = getAppointmentsForDate(date).length > 0;
-                    
+                    const hasAppointments =
+                      getAppointmentsForDate(date).length > 0;
                     return (
                       <button
-                        key={index}
-                        className={`calendar-day ${isSelected ? 'selected' : ''} ${!isCurrentMonth ? 'other-month' : ''} ${isUnavailable ? 'unavailable' : ''} ${hasAppointments ? 'has-appointments' : ''}`}
+                        key={i}
+                        className={`calendar-day ${
+                          isSelected ? "selected" : ""
+                        } ${!isCurrentMonth ? "other-month" : ""} ${
+                          isUnavailable ? "unavailable" : ""
+                        } ${hasAppointments ? "has-appointments" : ""}`}
                         onClick={() => handleDateSelect(date)}
                         disabled={!isCurrentMonth}
                       >
-                        {format(date, 'd')}
+                        {format(date, "d")}
                       </button>
                     );
                   })}
                 </div>
               </div>
             </div>
-
-            {/* Availability Settings */}
             <div className="availability-section">
               <div className="section-header">
                 <Settings size={20} />
                 <h3>Availability Settings</h3>
               </div>
               <p className="section-description">Manage your availability.</p>
-              
               <div className="selected-date-info">
-                Selected Date: {format(selectedDate, 'EEE MMM d yyyy')}
+                Selected Date: {format(selectedDate, "EEE MMM d yyyy")}
               </div>
-              
-              <button 
-                className={`availability-btn ${isDateUnavailable(selectedDate) ? 'available' : 'unavailable'}`}
+              <button
+                className={`availability-btn ${
+                  isDateUnavailable(selectedDate) ? "available" : "unavailable"
+                }`}
                 onClick={handleMarkUnavailable}
               >
-                {isDateUnavailable(selectedDate) ? 'Mark as Available' : 'Mark as Unavailable'}
+                {isDateUnavailable(selectedDate)
+                  ? "Mark as Available"
+                  : "Mark as Unavailable"}
               </button>
             </div>
           </div>
-
-          {/* Right Content Area */}
           <div className="content-area">
-            {/* Tabs */}
             <div className="appointment-tabs">
               <button
-                className={`tab-btn ${activeTab === 'today' ? 'active' : ''}`}
-                onClick={() => setActiveTab('today')}
+                className={"tab-btn active"}
+                onClick={() => setActiveTab("today")}
               >
-                Today's Appointments
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
-                onClick={() => setActiveTab('history')}
-              >
-                Appointment History
+                Appointments
               </button>
             </div>
-
-            {/* Appointments List */}
             <div className="appointments-section">
               <div className="appointments-header">
-                <h3>Appointments for {format(selectedDate, 'EEE MMM d yyyy')}</h3>
+                <h3>
+                  Appointments for {format(selectedDate, "EEE MMM d yyyy")}
+                </h3>
                 <p>{filteredAppointments.length} appointments scheduled</p>
               </div>
-
               <div className="appointments-list">
-                {filteredAppointments.length > 0 ? (
-                  filteredAppointments.map(appointment => (
-                    <div key={appointment.id} className="appointment-card">
+                {loadingAppointments ? (
+                  <p>Loading appointments...</p>
+                ) : filteredAppointments.length > 0 ? (
+                  filteredAppointments.map((apt) => (
+                    <div key={apt.id} className="appointment-card">
                       <div className="appointment-header">
-                        <img 
-                          src={appointment.patientImage} 
-                          alt={appointment.patientName} 
-                          className="patient-avatar" 
+                        <img
+                          src={apt.patientImage}
+                          alt={apt.patientName}
+                          className="patient-avatar"
                         />
                         <div className="patient-info">
-                          <h4 className="patient-name">{appointment.patientName}</h4>
+                          <h4 className="patient-name">{apt.patientName}</h4>
                           <p className="patient-details">
-                            Age: {appointment.age} · {appointment.type}
+                            {apt.type ? `Type: ${apt.type}` : ""}
                           </p>
                         </div>
-                        <div className="appointment-time">
-                          {appointment.time}
-                        </div>
+                        <div className="appointment-time">{apt.time}</div>
                       </div>
-                      
                       <div className="appointment-footer">
-                        <span 
+                        <span
                           className="status-badge"
-                          style={{ backgroundColor: getStatusColor(appointment.status) }}
+                          style={{
+                            backgroundColor: getStatusColor(apt.status),
+                          }}
                         >
-                          {getStatusText(appointment.status)}
+                          {getStatusText(apt.status)}
                         </span>
-                        <button 
-                          className="view-details-btn"
-                          onClick={() => handleViewDetails(appointment)}
-                        >
-                          View Details
-                        </button>
+                        <div style={{ display: "flex", gap: "10px" }}>
+                          <button
+                            className="accept-btn"
+                            onClick={() => handleAccept(apt.id)}
+                            disabled={
+                              apt.status === "confirmed" ||
+                              apt.status === "completed"
+                            }
+                          >
+                            {apt.status === "confirmed"
+                              ? "Accepted"
+                              : apt.status === "completed"
+                              ? "Completed"
+                              : "Accept"}
+                          </button>
+
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDelete(apt.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -296,15 +319,6 @@ const DoctorDashboard = ({ user, onLogout }) => {
           </div>
         </div>
       </main>
-
-      {/* Appointment Modal */}
-      <AppointmentModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        appointment={selectedAppointment}
-        onSchedule={handleScheduleAppointment}
-        isPatient={false}
-      />
     </div>
   );
 };

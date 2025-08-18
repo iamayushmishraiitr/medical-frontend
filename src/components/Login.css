@@ -400,6 +400,33 @@
   color: #495057;
 }
 
+.form-footer {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.form-footer p {
+  color: #6c757d;
+  margin: 0;
+}
+
+.switch-btn {
+  background: none;
+  border: none;
+  color: #198754;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 8px;
+  transition: color 0.3s ease;
+}
+
+.switch-btn:hover {
+  color: #157347;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .login-container {

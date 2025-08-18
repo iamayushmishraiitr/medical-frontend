@@ -4,7 +4,6 @@
   background-color: #f8f9fa;
 }
 
-/* Utility classes */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -71,7 +70,6 @@
   color: white;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .container {
     padding: 0 15px;
