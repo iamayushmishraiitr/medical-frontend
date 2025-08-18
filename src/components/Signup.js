@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Eye, EyeOff, Stethoscope, Mail, Lock, Phone, MapPin } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import {API_BASE_URL} from "../services/api"
 import './Signup.css';
 
 const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
@@ -48,7 +49,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
     setIsLoading(true);
 
     try {
-        const response = await fetch('https://medical-app-backend-73qf.onrender.com/api/auth/register', {
+        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
