@@ -17,7 +17,6 @@ function App() {
   };
    
   const handleSignup = (signupData) => {
-    
     setUser(signupData.user);
     toast.success('Account created successfully! Welcome to MediCare.');
   };

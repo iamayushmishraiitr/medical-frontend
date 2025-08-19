@@ -53,12 +53,11 @@ export const api = {
     return response.json();
   },
 
- // api.js
  updateAppointmentStatus  : async (id, status) => {
   const response = await fetch(`${API_BASE_URL}/appointments/${id}/status`, {
-    method: "PUT", // changed from PATCH → PUT
+    method: "PUT", 
     headers: {
-      ...getAuthHeaders(), // should return { Authorization: `Bearer ${token}` }
+      ...getAuthHeaders(), 
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ status }),

@@ -68,7 +68,8 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
           const data = await response.json();
       
       if (response.ok) {
-        console.log("here is response",data)
+        localStorage.setItem('token', data?.token);
+        localStorage.setItem('user', JSON.stringify(data?.user));
         toast.success(`Welcome ${formData.name}! Account created successfully.`);
         onSignupSuccess(data);
       } else {
