@@ -5,6 +5,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  User
 } from "lucide-react";
 import {
   format,
@@ -28,10 +29,10 @@ const DoctorDashboard = ({ user, onLogout }) => {
   const [unavailableDates, setUnavailableDates] = useState([]);
   const [loadingAppointments, setLoadingAppointments] = useState(false);
 
-  // ✅ Helper: Get current IST time
+
   const getCurrentIST = () => {
     const now = new Date();
-    return new Date(now.getTime() + (5 * 60 + 30) * 60000); // UTC + 5:30
+    return new Date(now.getTime() + (5 * 60 + 30) * 60000); 
   };
 
   useEffect(() => {
@@ -100,7 +101,6 @@ const DoctorDashboard = ({ user, onLogout }) => {
   const isDateUnavailable = (date) =>
     unavailableDates.includes(format(date, "yyyy-MM-dd"));
 
-  // ✅ Accept appointment
   const handleAccept = async (id) => {
     try {
       await api.updateAppointmentStatus(id, "confirmed");
@@ -116,7 +116,6 @@ const DoctorDashboard = ({ user, onLogout }) => {
     }
   };
 
-  // ✅ Delete appointment
   const handleDelete = async (id) => {
     try {
       await api.deleteAppointment(id);
@@ -129,9 +128,9 @@ const DoctorDashboard = ({ user, onLogout }) => {
   };
 
   const getStatusColor = (status) => {
-    if (status === "confirmed") return "#198754"; // green
-    if (status === "completed") return "#6c757d"; // gray
-    return "#ffc107"; // yellow (pending)
+    if (status === "confirmed") return "#198754";
+    if (status === "completed") return "#6c757d"; 
+    return "#ffc107";
   };
 
   const getStatusText = (status) =>
@@ -144,7 +143,6 @@ const DoctorDashboard = ({ user, onLogout }) => {
 
   return (
     <div className="doctor-dashboard">
-      {/* Header */}
       <header className="dashboard-header">
         <div className="header-left">
           <h1 className="logo">MediCare</h1>
@@ -241,7 +239,7 @@ const DoctorDashboard = ({ user, onLogout }) => {
           <div className="content-area">
             <div className="appointment-tabs">
               <button
-                className={"tab-btn active"}
+                className= "tab-btn active"
                 onClick={() => setActiveTab("today")}
               >
                 Appointments
@@ -261,11 +259,7 @@ const DoctorDashboard = ({ user, onLogout }) => {
                   filteredAppointments.map((apt) => (
                     <div key={apt.id} className="appointment-card">
                       <div className="appointment-header">
-                        <img
-                          src={apt.patientImage}
-                          alt={apt.patientName}
-                          className="patient-avatar"
-                        />
+                      <User size={14} className="patient-avatar" />
                         <div className="patient-info">
                           <h4 className="patient-name">{apt.patientName}</h4>
                           <p className="patient-details">

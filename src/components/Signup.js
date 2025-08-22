@@ -1,19 +1,28 @@
-import React, { useState } from 'react';
-import { User, Eye, EyeOff, Stethoscope, Mail, Lock, Phone, MapPin } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import {API_BASE_URL} from "../services/api"
-import './Signup.css';
+import React, { useState } from "react";
+import {
+  User,
+  Eye,
+  EyeOff,
+  Stethoscope,
+  Mail,
+  Lock,
+  Phone,
+  MapPin,
+} from "lucide-react";
+import { toast } from "react-hot-toast";
+import { API_BASE_URL } from "../services/api";
+import "./Signup.css";
 
 const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'patient',
-    specialization: '',
-    phone: '',
-    address: ''
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "patient",
+    specialization: "",
+    phone: "",
+    address: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,63 +30,65 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+      toast.error("Password must be at least 6 characters long");
       return;
     }
 
-    if (formData.role === 'doctor' && !formData.specialization.trim()) {
-      toast.error('Specialization is required for doctors');
+    if (formData.role === "doctor" && !formData.specialization.trim()) {
+      toast.error("Specialization is required for doctors");
       return;
     }
 
     setIsLoading(true);
 
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',   
-            body: JSON.stringify({
-              name: formData.name,
-              email: formData.email,
-              password: formData.password,
-              role: formData.role,
-              specialization: formData.specialization,
-              phone: formData.phone,
-              address: formData.address
-            }),
-          });
-          const data = await response.json();
-      
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+          specialization: formData.specialization,
+          phone: formData.phone,
+          address: formData.address,
+        }),
+      });
+      const data = await response.json();
+
       if (response.ok) {
-        localStorage.setItem('token', data?.token);
-        localStorage.setItem('user', JSON.stringify(data?.user));
-        toast.success(`Welcome ${formData.name}! Account created successfully.`);
+        localStorage.setItem("token", data?.token);
+        localStorage.setItem("user", JSON.stringify(data?.user));
+        toast.success(
+          `Welcome ${formData.name}! Account created successfully.`
+        );
         onSignupSuccess(data);
       } else {
-        toast.error(data.message || 'Registration failed');
+        toast.error(data.message || "Registration failed");
       }
     } catch (error) {
-      console.error('Signup error:', error);
-      toast.error('Network error. Please try again.');
+      console.error("Signup error:", error);
+      toast.error("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +156,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                 </label>
                 <div className="password-input">
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     id="password"
                     name="password"
                     placeholder="Enter your password"
@@ -170,7 +181,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                 </label>
                 <div className="password-input">
                   <input
-                    type={showConfirmPassword ? 'text' : 'password'}
+                    type={showConfirmPassword ? "text" : "password"}
                     id="confirmPassword"
                     name="confirmPassword"
                     placeholder="Confirm your password"
@@ -183,7 +194,11 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                     className="password-toggle"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showConfirmPassword ? (
+                      <EyeOff size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
                   </button>
                 </div>
               </div>
@@ -207,21 +222,27 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                 </select>
               </div>
 
-              {formData.role === 'doctor' && (
+              {formData.role === "doctor" && (
                 <div className="form-group">
                   <label htmlFor="specialization">
                     <Stethoscope size={16} />
                     Specialization
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="specialization"
                     name="specialization"
-                    placeholder="e.g., Cardiology, Dermatology"
                     value={formData.specialization}
                     onChange={handleInputChange}
                     required
-                  />
+                  >
+                    <option value="">Select specialization</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Dermatology">Dermatology</option>
+                    <option value="Neurology">Neurology</option>
+                    <option value="Orthopedics">Orthopedics</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                    <option value="Psychiatry">Psychiatry</option>
+                  </select>
                 </div>
               )}
             </div>
@@ -259,14 +280,15 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
             </div>
 
             <button type="submit" className="signup-btn" disabled={isLoading}>
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              {isLoading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
           <div className="form-footer">
-            <p>Already have an account? 
-              <button 
-                type="button" 
+            <p>
+              Already have an account?
+              <button
+                type="button"
                 className="switch-btn"
                 onClick={onSwitchToLogin}
               >
@@ -281,4 +303,3 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
 };
 
 export default Signup;
-

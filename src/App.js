@@ -35,7 +35,6 @@ function App() {
     setShowSignup(false);
   };
 
-  // Check if user is logged in from localStorage on app start
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');

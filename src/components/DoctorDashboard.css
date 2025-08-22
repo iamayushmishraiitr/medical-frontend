@@ -3,7 +3,7 @@
   background-color: #f8f9fa;
 }
 
-/* Header Styles */
+
 .dashboard-header {
   background-color: #e9ecef;
   padding: 16px 20px;
@@ -341,10 +341,11 @@
 }
 
 .patient-avatar {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height:50px;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit:fill ;
+  background-color: #a9a9a9;
 }
 
 .patient-info {

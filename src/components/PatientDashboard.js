@@ -12,7 +12,6 @@ import {
   Clock as ClockIcon,
   ChevronDown,
   ChevronUp,
-  Stars
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import AppointmentModal from "./AppointmentModal";
@@ -41,7 +40,6 @@ const PatientDashboard = ({ user, onLogout }) => {
     "Oncology",
   ];
 
-  // Check if mobile view
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 1200);
@@ -53,12 +51,10 @@ const PatientDashboard = ({ user, onLogout }) => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Set initial state based on screen size
   useEffect(() => {
     setShowHistory(!isMobile);
   }, [isMobile]);
 
-  // Fetch doctors and appointments
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -87,8 +83,6 @@ const PatientDashboard = ({ user, onLogout }) => {
 
   useEffect(() => {
     let filtered = doctors;
-
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(
         (doctor) =>
@@ -97,7 +91,6 @@ const PatientDashboard = ({ user, onLogout }) => {
       );
     }
 
-    // Filter by specialization
     if (selectedSpecialization !== "All") {
       filtered = filtered.filter(
         (doctor) => doctor.specialization === selectedSpecialization
@@ -126,8 +119,6 @@ const PatientDashboard = ({ user, onLogout }) => {
         toast.success(
           `Appointment scheduled successfully with ${selectedDoctor.name} on ${appointmentData.date} at ${appointmentData.time}`
         );
-
-        // Refresh appointments
         const appointmentsResponse = await api.getAppointments();
         if (appointmentsResponse.appointments) {
           setAppointmentHistory(appointmentsResponse.appointments);
@@ -195,7 +186,6 @@ const PatientDashboard = ({ user, onLogout }) => {
   const randomRating = (Math.random() * (4.6 - 4.1) + 4.1).toFixed(1);
   return (
     <div className="patient-dashboard">
-      {/* Header */}
       <header className="dashboard-header">
         <div className="header-left">
           <h1 className="logo">MediCare</h1>
@@ -209,16 +199,11 @@ const PatientDashboard = ({ user, onLogout }) => {
           </button>
         </div>
       </header>
-
-      {/* Main Content */}
       <main className="dashboard-main">
         <div className="dashboard-layout">
-          {/* Left Column - Main Content */}
           <div className="main-content">
             <div className="container">
               <h2 className="page-title">Find Your Doctor</h2>
-
-              {/* Search Bar */}
               <div className="search-section">
                 <div className="search-bar">
                   <Search size={20} className="search-icon" />
@@ -231,8 +216,6 @@ const PatientDashboard = ({ user, onLogout }) => {
                   />
                 </div>
               </div>
-
-              {/* Specialization Filters */}
               <div className="specialization-filters">
                 {specializations.map((spec) => (
                   <button
@@ -246,8 +229,6 @@ const PatientDashboard = ({ user, onLogout }) => {
                   </button>
                 ))}
               </div>
-
-              {/* Doctors Grid */}
               <div className="doctors-grid">
                 {filteredDoctors.map((doctor) => (
                   <div key={doctor._id} className="doctor-card">
@@ -266,7 +247,14 @@ const PatientDashboard = ({ user, onLogout }) => {
                       </div>
                     </div>
 
-                    <div style={{width :"100%" ,display:"flex", marginBottom :"10px" , gap :"10px"}}>
+                    <div
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        marginBottom: "10px",
+                        gap: "10px",
+                      }}
+                    >
                       <Star size={18} className="star-icon" />
                       <h5>{randomRating}</h5>
                     </div>
@@ -295,8 +283,6 @@ const PatientDashboard = ({ user, onLogout }) => {
               )}
             </div>
           </div>
-
-          {/* Right Column - Appointment History Sidebar */}
           <div className="history-sidebar">
             <div className="history-header">
               <h3 className="history-title">

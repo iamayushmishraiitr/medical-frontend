@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { X, Calendar, Clock, User, MapPin } from 'lucide-react';
 import './AppointmentModal.css';
 
@@ -7,10 +7,9 @@ const AppointmentModal = ({ isOpen, onClose, appointment, onSchedule, isPatient 
   const [selectedTime, setSelectedTime] = useState('');
   const [notes, setNotes] = useState('');
 
-  // Set initial values if editing an existing appointment
-  React.useEffect(() => {
+  useEffect(() => {
     if (appointment && !isPatient) {
-      // For doctor viewing existing appointments, show current appointment details
+    
       setSelectedDate(appointment.date || '');
       setSelectedTime(appointment.time || '');
     }
@@ -55,7 +54,7 @@ const AppointmentModal = ({ isOpen, onClose, appointment, onSchedule, isPatient 
         </div>
 
         <div className="modal-body">
-          {/* Appointment Details */}
+
           {appointment && (
             <div className="appointment-details">
               <h3>{isPatient ? 'Doctor Details' : 'Appointment Details'}</h3>
@@ -101,8 +100,6 @@ const AppointmentModal = ({ isOpen, onClose, appointment, onSchedule, isPatient 
               )}
             </div>
           )}
-
-          {/* Scheduling Form */}
           <form onSubmit={handleSubmit} className="scheduling-form">
             <div className="form-group">
               <label htmlFor="appointment-date">
